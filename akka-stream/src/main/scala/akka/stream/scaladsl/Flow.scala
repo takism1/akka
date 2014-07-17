@@ -284,7 +284,7 @@ trait Flow[+T] {
    * not shutdown until the subscriptions for `other` and at least
    * one downstream consumer have been established.
    */
-  def tee(other: Consumer[_ >: T]): Flow[T]
+  def broadcast(other: Consumer[_ >: T]): Flow[T]
 
   /**
    * Transforms a stream of streams into a contiguous stream of elements using the provided flattening strategy.

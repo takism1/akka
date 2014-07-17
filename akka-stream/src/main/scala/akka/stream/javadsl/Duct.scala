@@ -227,7 +227,7 @@ abstract class Duct[In, Out] {
    * not shutdown until the subscriptions for `other` and at least
    * one downstream consumer have been established.
    */
-  def tee(other: Consumer[_ >: Out]): Duct[In, Out]
+  def broadcast(other: Consumer[_ >: Out]): Duct[In, Out]
 
   /**
    * Transforms a stream of streams into a contiguous stream of elements using the provided flattening strategy.
@@ -394,8 +394,8 @@ private[akka] class DuctAdapter[In, T](delegate: SDuct[In, T]) extends Duct[In, 
   override def concat[U >: T](next: Producer[U]): Duct[In, U] =
     new DuctAdapter(delegate.concat(next))
 
-  override def tee(other: Consumer[_ >: T]): Duct[In, T] =
-    new DuctAdapter(delegate.tee(other))
+  override def broadcast(other: Consumer[_ >: T]): Duct[In, T] =
+    new DuctAdapter(delegate.broadcast(other))
 
   override def buffer(size: Int, overflowStrategy: OverflowStrategy): Duct[In, T] =
     new DuctAdapter(delegate.buffer(size, overflowStrategy))

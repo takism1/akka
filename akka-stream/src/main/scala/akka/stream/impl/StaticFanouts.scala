@@ -12,7 +12,7 @@ import org.reactivestreams.spi.Subscription
 /**
  * INTERNAL API
  */
-private[akka] class TeeImpl(_settings: MaterializerSettings, other: Consumer[Any])
+private[akka] class BroadcastImpl(_settings: MaterializerSettings, other: Consumer[Any])
   extends ActorProcessorImpl(_settings) {
 
   override val primaryOutputs = new FanoutOutputs(settings.maxFanOutBufferSize, settings.initialFanOutBufferSize, self, pump = this) {

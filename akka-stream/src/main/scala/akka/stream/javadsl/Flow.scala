@@ -288,7 +288,7 @@ abstract class Flow[T] {
    * not shutdown until the subscriptions for `other` and at least
    * one downstream consumer have been established.
    */
-  def tee(other: Consumer[_ >: T]): Flow[T]
+  def broadcast(other: Consumer[_ >: T]): Flow[T]
 
   /**
    * Append the operations of a [[Duct]] to this flow.
@@ -461,8 +461,8 @@ private[akka] class FlowAdapter[T](delegate: SFlow[T]) extends Flow[T] {
   override def concat[U >: T](next: Producer[U]): Flow[U] =
     new FlowAdapter(delegate.concat(next))
 
-  override def tee(other: Consumer[_ >: T]): Flow[T] =
-    new FlowAdapter(delegate.tee(other))
+  override def broadcast(other: Consumer[_ >: T]): Flow[T] =
+    new FlowAdapter(delegate.broadcast(other))
 
   override def flatten[U](strategy: FlattenStrategy[T, U]): Flow[U] =
     new FlowAdapter(delegate.flatten(strategy))

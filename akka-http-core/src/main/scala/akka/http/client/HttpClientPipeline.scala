@@ -42,7 +42,7 @@ private[http] class HttpClientPipeline(effectiveSettings: ClientConnectionSettin
 
     val requestConsumer =
       Duct[(HttpRequest, Any)]
-        .tee(contextBypassConsumer)
+        .broadcast(contextBypassConsumer)
         .map(requestMethodByPass)
         .transform(responseRendererFactory.newRenderer)
         .flatten(FlattenStrategy.concat)
