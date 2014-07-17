@@ -20,7 +20,7 @@ class FlowDropWithinSpec extends AkkaSpec {
       val input = Iterator.from(1)
       val p = StreamTestKit.producerProbe[Int]
       val c = StreamTestKit.consumerProbe[Int]
-      Flow(p).dropWithin(1.second).produceTo(materializer, c)
+      Flow(p).dropWithin(1.second).produceTo(c, materializer)
       val pSub = p.expectSubscription
       val cSub = c.expectSubscription
       cSub.requestMore(100)

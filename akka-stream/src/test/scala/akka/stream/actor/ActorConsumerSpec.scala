@@ -106,7 +106,7 @@ class ActorConsumerSpec extends AkkaSpec with ImplicitSender {
 
     "receive requested elements" in {
       val ref = system.actorOf(manualConsumerProps(testActor))
-      Flow(List(1, 2, 3)).produceTo(materializer, ActorConsumer(ref))
+      Flow(List(1, 2, 3)).produceTo(ActorConsumer(ref), materializer)
       expectNoMsg(200.millis)
       ref ! "ready" // requesting 2
       expectMsg(OnNext(1))
@@ -120,14 +120,14 @@ class ActorConsumerSpec extends AkkaSpec with ImplicitSender {
     "signal error" in {
       val ref = system.actorOf(manualConsumerProps(testActor))
       val e = new RuntimeException("simulated") with NoStackTrace
-      Flow(() ⇒ throw e).produceTo(materializer, ActorConsumer(ref))
+      Flow(() ⇒ throw e).produceTo(ActorConsumer(ref), materializer)
       ref ! "ready"
       expectMsg(OnError(e))
     }
 
     "remember requested after restart" in {
       val ref = system.actorOf(manualConsumerProps(testActor))
-      Flow(1 to 7).produceTo(materializer, ActorConsumer(ref))
+      Flow(1 to 7).produceTo(ActorConsumer(ref), materializer)
       ref ! "ready"
       expectMsg(OnNext(1))
       expectMsg(OnNext(2))
@@ -145,7 +145,7 @@ class ActorConsumerSpec extends AkkaSpec with ImplicitSender {
 
     "not deliver more after cancel" in {
       val ref = system.actorOf(manualConsumerProps(testActor))
-      Flow(1 to 5).produceTo(materializer, ActorConsumer(ref))
+      Flow(1 to 5).produceTo(ActorConsumer(ref), materializer)
       ref ! "ready"
       expectMsg(OnNext(1))
       expectMsg(OnNext(2))
@@ -155,14 +155,14 @@ class ActorConsumerSpec extends AkkaSpec with ImplicitSender {
 
     "work with OneByOneRequestStrategy" in {
       val ref = system.actorOf(requestStrategyConsumerProps(testActor, OneByOneRequestStrategy))
-      Flow(1 to 17).produceTo(materializer, ActorConsumer(ref))
+      Flow(1 to 17).produceTo(ActorConsumer(ref), materializer)
       for (n ← 1 to 17) expectMsg(OnNext(n))
       expectMsg(OnComplete)
     }
 
     "work with WatermarkRequestStrategy" in {
       val ref = system.actorOf(requestStrategyConsumerProps(testActor, WatermarkRequestStrategy(highWatermark = 10)))
-      Flow(1 to 17).produceTo(materializer, ActorConsumer(ref))
+      Flow(1 to 17).produceTo(ActorConsumer(ref), materializer)
       for (n ← 1 to 17) expectMsg(OnNext(n))
       expectMsg(OnComplete)
     }
@@ -170,7 +170,7 @@ class ActorConsumerSpec extends AkkaSpec with ImplicitSender {
     "suport custom max in flight request strategy with child workers" in {
       val ref = system.actorOf(streamerProps)
       val N = 117
-      Flow(1 to N).map(Msg(_, testActor)).produceTo(materializer, ActorConsumer(ref))
+      Flow(1 to N).map(Msg(_, testActor)).produceTo(ActorConsumer(ref), materializer)
       receiveN(N).toSet should be((1 to N).map(Done(_)).toSet)
     }
 

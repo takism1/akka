@@ -232,7 +232,7 @@ class ActorProducerSpec extends AkkaSpec with ImplicitSender {
       val rcv = system.actorOf(receiverProps(probe.ref))
       Flow(ActorProducer[Int](snd)).collect {
         case n if n % 2 == 0 ⇒ "elem-" + n
-      }.produceTo(materializer, ActorConsumer(rcv))
+      }.produceTo(ActorConsumer(rcv), materializer)
 
       (1 to 3) foreach { snd ! _ }
       probe.expectMsg("elem-2")

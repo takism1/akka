@@ -369,7 +369,7 @@ trait Flow[+T] {
    *
    * *This operation materializes the flow and initiates its execution.*
    */
-  def onComplete(materializer: FlowMaterializer)(callback: Try[Unit] ⇒ Unit): Unit
+  def onComplete(callback: Try[Unit] ⇒ Unit, materializer: FlowMaterializer): Unit
 
   /**
    * Materialize this flow and return the downstream-most
@@ -391,7 +391,7 @@ trait Flow[+T] {
    * The given FlowMaterializer decides how the flow’s logical structure is
    * broken down into individual processing steps.
    */
-  def produceTo(materializer: FlowMaterializer, consumer: Consumer[_ >: T]): Unit
+  def produceTo(consumer: Consumer[_ >: T], materializer: FlowMaterializer): Unit
 
 }
 

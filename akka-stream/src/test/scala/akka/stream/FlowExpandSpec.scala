@@ -25,7 +25,7 @@ class FlowExpandSpec extends AkkaSpec {
       val consumer = StreamTestKit.consumerProbe[Int]
 
       // Simply repeat the last element as an extrapolation step
-      Flow(producer).expand[Int, Int](seed = i ⇒ i, extrapolate = i ⇒ (i, i)).produceTo(materializer, consumer)
+      Flow(producer).expand[Int, Int](seed = i ⇒ i, extrapolate = i ⇒ (i, i)).produceTo(consumer, materializer)
 
       val autoProducer = new StreamTestKit.AutoProducer(producer)
       val sub = consumer.expectSubscription()
@@ -45,7 +45,7 @@ class FlowExpandSpec extends AkkaSpec {
       val consumer = StreamTestKit.consumerProbe[Int]
 
       // Simply repeat the last element as an extrapolation step
-      Flow(producer).expand[Int, Int](seed = i ⇒ i, extrapolate = i ⇒ (i, i)).produceTo(materializer, consumer)
+      Flow(producer).expand[Int, Int](seed = i ⇒ i, extrapolate = i ⇒ (i, i)).produceTo(consumer, materializer)
 
       val autoProducer = new StreamTestKit.AutoProducer(producer)
       val sub = consumer.expectSubscription()
@@ -78,7 +78,7 @@ class FlowExpandSpec extends AkkaSpec {
       val producer = StreamTestKit.producerProbe[Int]
       val consumer = StreamTestKit.consumerProbe[Int]
 
-      Flow(producer).expand[Int, Int](seed = i ⇒ i, extrapolate = i ⇒ (i, i)).produceTo(materializer, consumer)
+      Flow(producer).expand[Int, Int](seed = i ⇒ i, extrapolate = i ⇒ (i, i)).produceTo(consumer, materializer)
 
       val autoProducer = new StreamTestKit.AutoProducer(producer)
       val sub = consumer.expectSubscription()

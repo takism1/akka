@@ -48,7 +48,7 @@ public abstract class JavaTestServer {
                                         return JavaApiTestCases.handleRequest(request);
                                     }
                                 })
-                                .produceTo(materializer, conn.getResponseConsumer());
+                                .produceTo(conn.getResponseConsumer(), materializer);
                     }
                 }).consume(materializer);
             }

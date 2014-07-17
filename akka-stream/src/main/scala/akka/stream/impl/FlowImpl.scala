@@ -51,9 +51,9 @@ private[akka] case class FlowImpl[I, O](producerNode: Ast.ProducerNode[I], ops: 
   }
 
   override def consume(materializer: FlowMaterializer): Unit =
-    produceTo(materializer, new BlackholeConsumer(materializer.settings.maximumInputBufferSize))
+    produceTo(new BlackholeConsumer(materializer.settings.maximumInputBufferSize), materializer)
 
-  override def onComplete(materializer: FlowMaterializer)(callback: Try[Unit] ⇒ Unit): Unit =
+  override def onComplete(callback: Try[Unit] ⇒ Unit, materializer: FlowMaterializer): Unit =
     transform(new Transformer[O, Unit] {
       override def onNext(in: O) = Nil
       override def onError(e: Throwable) = {
@@ -68,7 +68,7 @@ private[akka] case class FlowImpl[I, O](producerNode: Ast.ProducerNode[I], ops: 
 
   override def toProducer(materializer: FlowMaterializer): Producer[O] = materializer.toProducer(producerNode, ops)
 
-  override def produceTo(materializer: FlowMaterializer, consumer: Consumer[_ >: O]) =
+  override def produceTo(consumer: Consumer[_ >: O], materializer: FlowMaterializer) =
     toProducer(materializer).produceTo(consumer.asInstanceOf[Consumer[O]])
 }
 
@@ -88,13 +88,13 @@ private[akka] case class DuctImpl[In, Out](ops: List[Ast.AstNode]) extends Duct[
   override def appendJava[U](duct: akka.stream.javadsl.Duct[_ >: Out, U]): Duct[In, U] =
     copy(ops = duct.ops ++: ops)
 
-  override def produceTo(materializer: FlowMaterializer, consumer: Consumer[Out]): Consumer[In] =
+  override def produceTo(consumer: Consumer[Out], materializer: FlowMaterializer): Consumer[In] =
     materializer.ductProduceTo(consumer, ops)
 
   override def consume(materializer: FlowMaterializer): Consumer[In] =
-    produceTo(materializer, new BlackholeConsumer(materializer.settings.maximumInputBufferSize))
+    produceTo(new BlackholeConsumer(materializer.settings.maximumInputBufferSize), materializer)
 
-  override def onComplete(materializer: FlowMaterializer)(callback: Try[Unit] ⇒ Unit): Consumer[In] =
+  override def onComplete(callback: Try[Unit] ⇒ Unit, materializer: FlowMaterializer): Consumer[In] =
     transform(new Transformer[Out, Unit] {
       override def onNext(in: Out) = Nil
       override def onError(e: Throwable) = {

@@ -83,7 +83,7 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
       val duct: Duct[Int, Long] = Duct[Int].map(_.toLong).timedIntervalBetween(in ⇒ in % 2 == 1, d ⇒ probe.ref ! d)
 
       val c1 = StreamTestKit.consumerProbe[Long]()
-      val c2: Consumer[Int] = duct.produceTo(materializer, c1)
+      val c2: Consumer[Int] = duct.produceTo(c1, materializer)
 
       val p = Flow(List(1, 2, 3)).toProducer(materializer)
       p.produceTo(c2)

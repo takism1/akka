@@ -15,7 +15,7 @@ class FlowProduceToConsumerSpec extends AkkaSpec {
 
     "produce elements to the consumer" in {
       val c = StreamTestKit.consumerProbe[Int]
-      Flow(List(1, 2, 3)).produceTo(materializer, c)
+      Flow(List(1, 2, 3)).produceTo(c, materializer)
       val s = c.expectSubscription()
       s.requestMore(3)
       c.expectNext(1)

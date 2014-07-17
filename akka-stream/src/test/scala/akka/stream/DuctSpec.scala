@@ -79,7 +79,7 @@ class DuctSpec extends AkkaSpec {
     "produceTo Consumer" in {
       val duct: Duct[String, String] = Duct[String]
       val c1 = StreamTestKit.consumerProbe[String]
-      val c2: Consumer[String] = duct.produceTo(materializer, c1)
+      val c2: Consumer[String] = duct.produceTo(c1, materializer)
       val source: Producer[String] = Flow(List("1", "2", "3")).toProducer(materializer)
       source.produceTo(c2)
 
@@ -118,7 +118,7 @@ class DuctSpec extends AkkaSpec {
     "perform transformation operation and produceTo Consumer" in {
       val duct = Duct[Int].map(_.toString)
       val c1 = StreamTestKit.consumerProbe[String]
-      val c2: Consumer[Int] = duct.produceTo(materializer, c1)
+      val c2: Consumer[Int] = duct.produceTo(c1, materializer)
 
       val sub1 = c1.expectSubscription
       sub1.requestMore(3)
@@ -136,7 +136,7 @@ class DuctSpec extends AkkaSpec {
     "perform multiple transformation operations and produceTo Consumer" in {
       val duct = Duct[Int].map(_.toString).map("elem-" + _)
       val c1 = StreamTestKit.consumerProbe[String]
-      val c2 = duct.produceTo(materializer, c1)
+      val c2 = duct.produceTo(c1, materializer)
 
       val sub1 = c1.expectSubscription
       sub1.requestMore(3)
@@ -153,10 +153,10 @@ class DuctSpec extends AkkaSpec {
 
     "call onComplete callback when done" in {
       val duct = Duct[Int].map(i ⇒ { testActor ! i.toString; i.toString })
-      val c = duct.onComplete(materializer) {
+      val c = duct.onComplete({
         case Success(_) ⇒ testActor ! "DONE"
         case Failure(e) ⇒ testActor ! e
-      }
+      }, materializer)
 
       val source = Flow(List(1, 2, 3)).toProducer(materializer)
       source.produceTo(c)
@@ -170,7 +170,7 @@ class DuctSpec extends AkkaSpec {
     "be appendable to a Flow" in {
       val c = StreamTestKit.consumerProbe[String]
       val duct = Duct[Int].map(_ + 10).map(_.toString)
-      Flow(List(1, 2, 3)).map(_ * 2).append(duct).map((s: String) ⇒ "elem-" + s).produceTo(materializer, c)
+      Flow(List(1, 2, 3)).map(_ * 2).append(duct).map((s: String) ⇒ "elem-" + s).produceTo(c, materializer)
 
       val sub = c.expectSubscription
       sub.requestMore(3)
@@ -187,9 +187,9 @@ class DuctSpec extends AkkaSpec {
         .map { i ⇒ (i * 2).toString }
         .append(duct1)
         .map { i ⇒ "elem-" + (i + 10) }
-        .produceTo(materializer, c)
+        .produceTo(c, materializer)
 
-      Flow(List(1, 2, 3)).produceTo(materializer, ductInConsumer)
+      Flow(List(1, 2, 3)).produceTo(ductInConsumer, materializer)
 
       val sub = c.expectSubscription
       sub.requestMore(3)

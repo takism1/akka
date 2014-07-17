@@ -24,7 +24,7 @@ class FlowConflateSpec extends AkkaSpec {
       val producer = StreamTestKit.producerProbe[Int]
       val consumer = StreamTestKit.consumerProbe[Int]
 
-      Flow(producer).conflate[Int](seed = i ⇒ i, aggregate = (sum, i) ⇒ sum + i).produceTo(materializer, consumer)
+      Flow(producer).conflate[Int](seed = i ⇒ i, aggregate = (sum, i) ⇒ sum + i).produceTo(consumer, materializer)
 
       val autoProducer = new StreamTestKit.AutoProducer(producer)
       val sub = consumer.expectSubscription()
@@ -42,7 +42,7 @@ class FlowConflateSpec extends AkkaSpec {
       val producer = StreamTestKit.producerProbe[Int]
       val consumer = StreamTestKit.consumerProbe[Int]
 
-      Flow(producer).conflate[Int](seed = i ⇒ i, aggregate = (sum, i) ⇒ sum + i).produceTo(materializer, consumer)
+      Flow(producer).conflate[Int](seed = i ⇒ i, aggregate = (sum, i) ⇒ sum + i).produceTo(consumer, materializer)
 
       val autoProducer = new StreamTestKit.AutoProducer(producer)
       val sub = consumer.expectSubscription()
@@ -70,7 +70,7 @@ class FlowConflateSpec extends AkkaSpec {
       val producer = StreamTestKit.producerProbe[Int]
       val consumer = StreamTestKit.consumerProbe[Int]
 
-      Flow(producer).conflate[Int](seed = i ⇒ i, aggregate = (sum, i) ⇒ sum + i).produceTo(materializer, consumer)
+      Flow(producer).conflate[Int](seed = i ⇒ i, aggregate = (sum, i) ⇒ sum + i).produceTo(consumer, materializer)
 
       val autoProducer = new StreamTestKit.AutoProducer(producer)
       val sub = consumer.expectSubscription()

@@ -23,7 +23,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       val input = Iterator.from(1)
       val p = StreamTestKit.producerProbe[Int]
       val c = StreamTestKit.consumerProbe[immutable.Seq[Int]]
-      Flow(p).groupedWithin(1000, 1.second).produceTo(materializer, c)
+      Flow(p).groupedWithin(1000, 1.second).produceTo(c, materializer)
       val pSub = p.expectSubscription
       val cSub = c.expectSubscription
       cSub.requestMore(100)
@@ -48,7 +48,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
 
     "deliver bufferd elements onComplete before the timeout" in {
       val c = StreamTestKit.consumerProbe[immutable.Seq[Int]]
-      Flow(1 to 3).groupedWithin(1000, 10.second).produceTo(materializer, c)
+      Flow(1 to 3).groupedWithin(1000, 10.second).produceTo(c, materializer)
       val cSub = c.expectSubscription
       cSub.requestMore(100)
       c.expectNext((1 to 3).toList)
@@ -60,7 +60,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       val input = Iterator.from(1)
       val p = StreamTestKit.producerProbe[Int]
       val c = StreamTestKit.consumerProbe[immutable.Seq[Int]]
-      Flow(p).groupedWithin(1000, 1.second).produceTo(materializer, c)
+      Flow(p).groupedWithin(1000, 1.second).produceTo(c, materializer)
       val pSub = p.expectSubscription
       val cSub = c.expectSubscription
       cSub.requestMore(1)
@@ -81,7 +81,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       val input = Iterator.from(1)
       val p = StreamTestKit.producerProbe[Int]
       val c = StreamTestKit.consumerProbe[immutable.Seq[Int]]
-      Flow(p).groupedWithin(1000, 500.millis).produceTo(materializer, c)
+      Flow(p).groupedWithin(1000, 500.millis).produceTo(c, materializer)
       val pSub = p.expectSubscription
       val cSub = c.expectSubscription
       cSub.requestMore(2)
@@ -103,7 +103,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       val input = Iterator.from(1)
       val p = StreamTestKit.producerProbe[Int]
       val c = StreamTestKit.consumerProbe[immutable.Seq[Int]]
-      Flow(p).groupedWithin(3, 2.second).produceTo(materializer, c)
+      Flow(p).groupedWithin(3, 2.second).produceTo(c, materializer)
       val pSub = p.expectSubscription
       val cSub = c.expectSubscription
       cSub.requestMore(4)

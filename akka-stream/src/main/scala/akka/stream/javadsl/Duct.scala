@@ -288,7 +288,7 @@ abstract class Duct[In, Out] {
    * The given FlowMaterializer decides how the flow’s logical structure is
    * broken down into individual processing steps.
    */
-  def produceTo(materializer: FlowMaterializer, consumer: Consumer[Out]): Consumer[In]
+  def produceTo(consumer: Consumer[Out], materializer: FlowMaterializer): Consumer[In]
 
   /**
    * Attaches a consumer to this stream which will just discard all received
@@ -310,7 +310,7 @@ abstract class Duct[In, Out] {
    *
    * *This operation materializes the flow and initiates its execution.*
    */
-  def onComplete(materializer: FlowMaterializer)(callback: OnCompleteCallback): Consumer[In]
+  def onComplete(callback: OnCompleteCallback, materializer: FlowMaterializer): Consumer[In]
 
   /**
    * Materialize this `Duct` into a `Consumer` representing the input side of the `Duct`
@@ -415,17 +415,17 @@ private[akka] class DuctAdapter[In, T](delegate: SDuct[In, T]) extends Duct[In, 
   override def append[U](duct: Duct[_ >: T, U]): Duct[In, U] =
     new DuctAdapter(delegate.appendJava(duct))
 
-  override def produceTo(materializer: FlowMaterializer, consumer: Consumer[T]): Consumer[In] =
-    delegate.produceTo(materializer, consumer)
+  override def produceTo(consumer: Consumer[T], materializer: FlowMaterializer): Consumer[In] =
+    delegate.produceTo(consumer, materializer)
 
   override def consume(materializer: FlowMaterializer): Consumer[In] =
     delegate.consume(materializer)
 
-  override def onComplete(materializer: FlowMaterializer)(callback: OnCompleteCallback): Consumer[In] =
-    delegate.onComplete(materializer) {
+  override def onComplete(callback: OnCompleteCallback, materializer: FlowMaterializer): Consumer[In] =
+    delegate.onComplete({
       case Success(_) ⇒ callback.onComplete(null)
       case Failure(e) ⇒ callback.onComplete(e)
-    }
+    }, materializer)
 
   override def build(materializer: FlowMaterializer): Pair[Consumer[In], Producer[T]] = {
     val (in, out) = delegate.build(materializer)
