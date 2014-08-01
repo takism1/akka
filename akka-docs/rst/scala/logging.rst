@@ -383,6 +383,11 @@ If you want to more accurately output the timestamp, use the MDC attribute ``akk
     </encoder>
   </appender>
 
+If you want to customize the format of ``akkaTimestamp``, create a class that extends Slf4jLogger
+and overrides the ``formatTimestamp`` method, and specify your class in the ``loggers`` element in the
+configuration.
+
+
 MDC values defined by the application
 -------------------------------------
 
